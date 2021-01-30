@@ -46,7 +46,7 @@ parser.add_argument('--cuda', action="store_true",
                     help='run on CUDA (default: False)')
 parser.add_argument('--task_demos', action="store_true")
 parser.add_argument('--critic_pretraining_steps', type=float, default=10000)
-parser.add_argument('--BC_steps', type=float, default=1000)
+parser.add_argument('--BC_steps', type=float, default=10000)
 
 args = parser.parse_args()
 
@@ -90,9 +90,12 @@ if args.task_demos:
             updates)
         updates += 1
     # Behavior clone policy on demos
-    agent.behavior_clone(
-        memory,
-        min(args.batch_size, num_task_transitions))
+    for i in range(args.BC_steps):
+        if i % 100 == 0:
+            print("Update: ", i)
+        agent.behavior_clone(
+            memory,
+            min(args.batch_size, num_task_transitions))
 
 for i_episode in itertools.count(1):
     episode_reward = 0
